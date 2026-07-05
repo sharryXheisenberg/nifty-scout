@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Nifty Scout Report</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+  body {
+    width: 1200px;
+    height: 1500px;
+    background: linear-gradient(160deg, #0b1220 0%, #101c33 55%, #0b1220 100%);
+    color: #f5f7fa;
+    position: relative;
+    overflow: hidden;
+  }
+  .header {
+    padding: 40px 50px 20px 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid rgba(255,255,255,0.08);
+  }
+  .brand { font-size: 34px; font-weight: 800; letter-spacing: 1px; color: #ffd23f; }
+  .subtitle { font-size: 16px; color: #9fb0c9; margin-top: 4px; }
+  .date-badge {
+    background: rgba(255,210,63,0.12);
+    border: 1px solid #ffd23f;
+    color: #ffd23f;
+    padding: 8px 18px;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .pitch {
+    position: relative;
+    margin: 30px auto 0 auto;
+    width: 1080px;
+    height: 1080px;
+    background: radial-gradient(ellipse at center, #14532d 0%, #0d3820 100%);
+    border-radius: 16px;
+    border: 3px solid rgba(255,255,255,0.15);
+  }
+  .pitch::before {
+    content: "";
+    position: absolute;
+    top: 50%; left: 20px; right: 20px;
+    height: 2px;
+    background: rgba(255,255,255,0.2);
+  }
+  .row {
+    position: absolute;
+    left: 0; right: 0;
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+  }
+  .row.fwd { top: 90px; }
+  .row.mid { top: 430px; }
+  .row.def { top: 770px; }
+
+  .player-card {
+    width: 220px;
+    background: rgba(15, 23, 42, 0.92);
+    border: 2px solid #ffd23f;
+    border-radius: 14px;
+    padding: 14px 12px;
+    text-align: center;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+  }
+  .player-card .pos-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    color: #0b1220;
+    background: #ffd23f;
+    padding: 2px 10px;
+    border-radius: 999px;
+    margin-bottom: 8px;
+  }
+  .player-card .symbol {
+    font-size: 18px;
+    font-weight: 800;
+    color: #ffffff;
+  }
+  .player-card .name {
+    font-size: 12px;
+    color: #9fb0c9;
+    margin-top: 2px;
+    min-height: 30px;
+  }
+  .player-card .score {
+    font-size: 26px;
+    font-weight: 900;
+    color: #ffd23f;
+    margin-top: 8px;
+  }
+  .player-card .stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: #cbd5e1;
+    margin-top: 8px;
+    border-top: 1px solid rgba(255,255,255,0.15);
+    padding-top: 6px;
+  }
+  .footer {
+    position: absolute;
+    bottom: 20px;
+    left: 0; right: 0;
+    text-align: center;
+    font-size: 13px;
+    color: #6b7f9c;
+  }
+</style>
+</head>
+<body>
+  <div class="header">
+    <div>
+      <div class="brand">NIFTY SCOUT REPORT</div>
+      <div class="subtitle">Today's Team of the Week &mdash; NSE Formation 4-3-3</div>
+    </div>
+    <div class="date-badge">{{RUN_DATE}}</div>
+  </div>
+
+  <div class="pitch">
+    <div class="row fwd">{{FWD_CARDS}}</div>
+    <div class="row mid">{{MID_CARDS}}</div>
+    <div class="row def">{{DEF_CARDS}}</div>
+  </div>
+
+  <div class="footer">Generated automatically &middot; Data via NSE/Yahoo Finance &middot; Not investment advice</div>
+</body>
+</html>
