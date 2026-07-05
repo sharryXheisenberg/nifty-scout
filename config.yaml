@@ -1,0 +1,59 @@
+# =============================================================================
+# Nifty Scout Report — Configuration
+# All tunable knobs live here so scoring/selection logic never needs editing.
+# =============================================================================
+
+data:
+  tickers_file: "data/tickers.json"
+  cache_dir: "data/cache"
+  lookback_days: 45          # history pulled per symbol (need 20d+ for indicators, buffer included)
+  cache_ttl_hours: 12        # reuse same-day cache within this window
+  max_workers: 8             # parallel fetch threads
+  request_timeout_sec: 15
+
+fetch:
+  max_retries: 3
+  retry_backoff_base_sec: 2  # exponential backoff: 2s, 4s, 8s
+  min_rows_required: 25      # skip symbol if fewer valid trading days returned
+
+scoring:
+  weights:
+    momentum: 0.40           # EMA(5) vs EMA(20) crossover strength
+    volume_surge: 0.30       # today's volume vs 20d average volume
+    volatility_adj_return: 0.20   # return / ATR (risk-adjusted move)
+    drawdown_penalty: 0.10   # subtracted; peak-to-trough pullback over lookback
+  momentum:
+    fast_ema: 5
+    slow_ema: 20
+  volatility:
+    atr_period: 14
+  normalization: "zscore"    # zscore | minmax — applied per-factor before weighting
+
+selector:
+  formation: "4-3-3"         # GK is not selected (no "defensive" analogue) -> 10 outfield slots
+  slots:
+    DEF: 4                   # lowest volatility, most stable large-caps
+    MID: 3                   # balanced score, mid-cap tilt
+    FWD: 3                   # highest momentum + volume surge
+  sector_cap_per_position: 2 # max stocks from same sector per position bucket (diversification)
+  universe_min_price_inr: 20 # exclude illiquid penny stocks
+  universe_min_avg_volume: 100000
+
+render:
+  template_path: "templates/card_template.html"
+  output_dir: "output"
+  image_width: 1200
+  image_height: 1500
+  engine: "playwright"       # playwright | pillow (playwright = template above is used)
+
+publish:
+  output_filename_pattern: "%Y-%m-%d.png"
+  latest_filename: "latest.png"
+  latest_json_filename: "latest.json"
+  auto_post_enabled: false   # flip true once TWITTER_* secrets are set in repo
+  git_commit: true
+  git_commit_message_pattern: "chore: scout report %Y-%m-%d"
+
+logging:
+  level: "INFO"
+  file: "output/run.log"
