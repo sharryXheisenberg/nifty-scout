@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import json
 import logging
+import threading
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
@@ -25,6 +26,7 @@ from typing import Optional
 import pandas as pd
 import yfinance as yf
 import yaml
+from curl_cffi import requests as curl_requests
 from tenacity import (
     retry,
     stop_after_attempt,
@@ -34,6 +36,33 @@ from tenacity import (
 )
 
 logger = logging.getLogger("nifty_scout.fetch")
+
+# A single shared session that impersonates a real Chrome TLS/HTTP fingerprint
+# via curl_cffi. Yahoo Finance has gotten aggressive about blocking requests
+# that look like plain Python/requests traffic (which is exactly what
+# datacenter IPs like GitHub Actions runners send by default) — impersonating
+# a real browser's fingerprint significantly reduces bot-detection blocks.
+_session = curl_requests.Session(impersonate="chrome")
+
+# Global lock ensures requests are fully serialized end-to-end (not just
+# spaced at start) — only one HTTP request to Yahoo is ever in flight at a
+# time, system-wide, with a minimum gap enforced *after* each one completes.
+# This matters more on shared/datacenter IPs (GitHub Actions) than on a
+# residential IP, where Yahoo's rate limiter is noticeably stricter.
+_request_lock = threading.Lock()
+_last_request_time = [0.0]
+
+
+def _throttled_call(min_interval_sec: float, fn, *args, **kwargs):
+    with _request_lock:
+        now = time.monotonic()
+        wait = _last_request_time[0] + min_interval_sec - now
+        if wait > 0:
+            time.sleep(wait)
+        try:
+            return fn(*args, **kwargs)
+        finally:
+            _last_request_time[0] = time.monotonic()
 
 
 class FetchError(Exception):
@@ -94,8 +123,8 @@ def _write_cache(path: Path, df: pd.DataFrame) -> None:
         logger.warning("Cache write failed for %s (%s)", path, e)
 
 
-def _make_retrying_download(max_retries: int, backoff_base: float):
-    """Wrap yf.download with tenacity retry, parameterized from config."""
+def _make_retrying_download(max_retries: int, backoff_base: float, min_request_interval_sec: float):
+    """Wrap the actual Yahoo call with tenacity retry, parameterized from config."""
 
     @retry(
         stop=stop_after_attempt(max_retries),
@@ -105,14 +134,16 @@ def _make_retrying_download(max_retries: int, backoff_base: float):
         reraise=True,
     )
     def _download(symbol: str, period_days: int, timeout: int) -> pd.DataFrame:
-        df = yf.download(
-            symbol,
-            period=f"{period_days}d",
-            interval="1d",
-            auto_adjust=True,
-            progress=False,
-            timeout=timeout,
-        )
+        def _do_request():
+            ticker = yf.Ticker(symbol, session=_session)
+            return ticker.history(
+                period=f"{period_days}d",
+                interval="1d",
+                auto_adjust=True,
+                timeout=timeout,
+            )
+
+        df = _throttled_call(min_request_interval_sec, _do_request)
         if df is None or df.empty:
             raise FetchError(f"Empty response for {symbol}")
         return df
@@ -175,6 +206,7 @@ def fetch_universe(config: dict) -> FetchResult:
     downloader = _make_retrying_download(
         max_retries=fetch_cfg["max_retries"],
         backoff_base=fetch_cfg["retry_backoff_base_sec"],
+        min_request_interval_sec=fetch_cfg.get("min_request_interval_sec", 1.5),
     )
 
     result = FetchResult()

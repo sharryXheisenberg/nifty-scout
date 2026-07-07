@@ -8,13 +8,14 @@ data:
   cache_dir: "data/cache"
   lookback_days: 45          # history pulled per symbol (need 20d+ for indicators, buffer included)
   cache_ttl_hours: 12        # reuse same-day cache within this window
-  max_workers: 8             # parallel fetch threads
+  max_workers: 2             # kept low deliberately — Yahoo's free endpoint rate-limits bursts hard
   request_timeout_sec: 15
 
 fetch:
-  max_retries: 3
-  retry_backoff_base_sec: 2  # exponential backoff: 2s, 4s, 8s
+  max_retries: 4
+  retry_backoff_base_sec: 4  # exponential backoff: 4s, 8s, 16s, 32s — more room for CI's shared-IP rate limiting
   min_rows_required: 25      # skip symbol if fewer valid trading days returned
+  min_request_interval_sec: 2.5   # global throttle: fully-serialized gap between requests, across all threads
 
 scoring:
   weights:
