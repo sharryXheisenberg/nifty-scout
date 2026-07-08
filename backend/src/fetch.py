@@ -1,6 +1,8 @@
 """
 fetch.py
 --------
+[FIX-MARKER: fetch-v2-curl-cffi-serialized]
+
 Pulls OHLCV history for the configured NSE ticker universe via yfinance.
 
 Design goals:

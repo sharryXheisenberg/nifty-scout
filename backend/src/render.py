@@ -84,7 +84,13 @@ def render_to_png(
     Path(output_path).parent.mkdir(parents=True, exist_ok=True)
 
     with sync_playwright() as p:
-        browser = p.chromium.launch()
+        try:
+            browser = p.chromium.launch(channel="chrome")
+        except Exception:
+            # Falls back to Playwright's own bundled Chromium if system
+            # Chrome isn't found — requires `playwright install chromium`
+            # to have been run at least once.
+            browser = p.chromium.launch()
         try:
             page = browser.new_page(viewport={"width": width, "height": height})
             page.set_content(html, wait_until="networkidle")

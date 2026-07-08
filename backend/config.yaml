@@ -1,5 +1,6 @@
 # =============================================================================
 # Nifty Scout Report — Configuration
+# [FIX-MARKER: config-v2-throttle-2.5s]
 # All tunable knobs live here so scoring/selection logic never needs editing.
 # =============================================================================
 
