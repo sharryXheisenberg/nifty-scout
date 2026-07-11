@@ -1,6 +1,5 @@
-# [FIX-MARKER: requirements-v2-curl-cffi]
+# [FIX-MARKER: requirements-v3-plain-session]
 yfinance==0.2.54
-curl_cffi==0.7.4
 pandas==2.2.3
 numpy==1.26.4
 ta==0.11.0

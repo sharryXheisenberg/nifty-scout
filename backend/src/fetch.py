@@ -1,7 +1,7 @@
 """
 fetch.py
 --------
-[FIX-MARKER: fetch-v2-curl-cffi-serialized]
+[FIX-MARKER: fetch-v3-plain-session-serialized]
 
 Pulls OHLCV history for the configured NSE ticker universe via yfinance.
 
@@ -26,9 +26,9 @@ from pathlib import Path
 from typing import Optional
 
 import pandas as pd
+import requests
 import yfinance as yf
 import yaml
-from curl_cffi import requests as curl_requests
 from tenacity import (
     retry,
     stop_after_attempt,
@@ -39,12 +39,22 @@ from tenacity import (
 
 logger = logging.getLogger("nifty_scout.fetch")
 
-# A single shared session that impersonates a real Chrome TLS/HTTP fingerprint
-# via curl_cffi. Yahoo Finance has gotten aggressive about blocking requests
-# that look like plain Python/requests traffic (which is exactly what
-# datacenter IPs like GitHub Actions runners send by default) — impersonating
-# a real browser's fingerprint significantly reduces bot-detection blocks.
-_session = curl_requests.Session(impersonate="chrome")
+# A plain requests.Session with a realistic browser User-Agent. Earlier we
+# tried a curl_cffi impersonated session here — that caused a *different*
+# crash ('str' object has no attribute 'name') due to a known incompatibility
+# between yfinance's internal cookie/crumb handling and curl_cffi's Session
+# shape. A plain requests.Session avoids that crash; the real defense
+# against rate-limiting is the full serialization + throttle below, not the
+# session type.
+_session = requests.Session()
+_session.headers.update(
+    {
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+            "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+        )
+    }
+)
 
 # Global lock ensures requests are fully serialized end-to-end (not just
 # spaced at start) — only one HTTP request to Yahoo is ever in flight at a
@@ -137,12 +147,14 @@ def _make_retrying_download(max_retries: int, backoff_base: float, min_request_i
     )
     def _download(symbol: str, period_days: int, timeout: int) -> pd.DataFrame:
         def _do_request():
-            ticker = yf.Ticker(symbol, session=_session)
-            return ticker.history(
+            return yf.download(
+                symbol,
                 period=f"{period_days}d",
                 interval="1d",
                 auto_adjust=True,
+                progress=False,
                 timeout=timeout,
+                session=_session,
             )
 
         df = _throttled_call(min_request_interval_sec, _do_request)
