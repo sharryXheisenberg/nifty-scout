@@ -1,0 +1,16 @@
+{
+  "date": "2026-07-04",
+  "formation": "4-3-3",
+  "players": [
+    { "symbol": "TRENT.NS", "name": "Trent Limited", "sector": "Retail", "position": "FWD", "composite_score": 1.8421, "momentum": 0.0512, "volume_surge": 1.2103, "volatility_adj_return": 2.31, "drawdown_penalty": 0.041, "latest_close": 5432.10, "latest_volume": 812345 },
+    { "symbol": "ZOMATO.NS", "name": "Zomato Limited", "sector": "Internet", "position": "FWD", "composite_score": 1.5213, "momentum": 0.0438, "volume_surge": 0.981, "volatility_adj_return": 1.98, "drawdown_penalty": 0.062, "latest_close": 267.35, "latest_volume": 15234000 },
+    { "symbol": "DIVISLAB.NS", "name": "Divi's Laboratories", "sector": "Pharma", "position": "FWD", "composite_score": 1.3087, "momentum": 0.0329, "volume_surge": 0.772, "volatility_adj_return": 1.71, "drawdown_penalty": 0.038, "latest_close": 6120.55, "latest_volume": 421000 },
+    { "symbol": "SIEMENS.NS", "name": "Siemens India", "sector": "Capital Goods", "position": "MID", "composite_score": 0.9214, "momentum": 0.0201, "volume_surge": 0.412, "volatility_adj_return": 1.02, "drawdown_penalty": 0.051, "latest_close": 6890.20, "latest_volume": 198000 },
+    { "symbol": "TITAN.NS", "name": "Titan Company", "sector": "Consumer Durables", "position": "MID", "composite_score": 0.8103, "momentum": 0.0176, "volume_surge": 0.351, "volatility_adj_return": 0.87, "drawdown_penalty": 0.047, "latest_close": 3421.80, "latest_volume": 1023000 },
+    { "symbol": "BEL.NS", "name": "Bharat Electronics", "sector": "Defence", "position": "MID", "composite_score": 0.7355, "momentum": 0.0148, "volume_surge": 0.281, "volatility_adj_return": 0.79, "drawdown_penalty": 0.044, "latest_close": 312.60, "latest_volume": 8934000 },
+    { "symbol": "HDFCBANK.NS", "name": "HDFC Bank", "sector": "Banking", "position": "DEF", "composite_score": 0.5214, "momentum": 0.0091, "volume_surge": 0.112, "volatility_adj_return": 0.51, "drawdown_penalty": 0.028, "latest_close": 1789.40, "latest_volume": 6234000 },
+    { "symbol": "TCS.NS", "name": "Tata Consultancy Services", "sector": "IT", "position": "DEF", "composite_score": 0.4732, "momentum": 0.0082, "volume_surge": 0.098, "volatility_adj_return": 0.46, "drawdown_penalty": 0.031, "latest_close": 4123.90, "latest_volume": 2145000 },
+    { "symbol": "NESTLEIND.NS", "name": "Nestle India", "sector": "FMCG", "position": "DEF", "composite_score": 0.4015, "momentum": 0.0067, "volume_surge": 0.084, "volatility_adj_return": 0.39, "drawdown_penalty": 0.025, "latest_close": 2456.15, "latest_volume": 145000 },
+    { "symbol": "POWERGRID.NS", "name": "Power Grid Corp", "sector": "Utilities", "position": "DEF", "composite_score": 0.3621, "momentum": 0.0059, "volume_surge": 0.071, "volatility_adj_return": 0.34, "drawdown_penalty": 0.022, "latest_close": 312.90, "latest_volume": 3456000 }
+  ]
+}
